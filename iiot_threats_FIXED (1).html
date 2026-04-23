@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IIoT Threat Landscape 2025 — Industrial Cybersecurity Deep Dive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #c0392b;
+  --red-dim: #922b21;
+  --neon: #0891b2;
+  --neon-dim: #0e7490;
+  --gold: #b7791f;
+  --dark: #ffffff;
+  --dark2: #f8fafc;
+  --dark3: #f1f5f9;
+  --glass: rgba(0,0,0,0.03);
+  --glass-border: rgba(0,0,0,0.1);
+  --text: #0f172a;
+  --muted: #475569;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--dark);
+  color: var(--text);
+  font-family: 'Times New Roman', Times, serif;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* CUSTOM CURSOR */
+.cursor { display: none; }
+.cursor-ring { display: none; }
+
+/* CANVAS BACKGROUND */
+#bg-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 1px 16px rgba(0,0,0,0.06);
+}
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 3px;
+  color: var(--neon);
+}
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--neon); }
+.nav-cta {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  padding: 8px 20px;
+  border: 1px solid var(--neon);
+  color: var(--neon);
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: background 0.3s;
+}
+.nav-cta:hover { background: var(--neon); color: var(--dark); }
+
+/* HERO */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 1;
+  background: #0f172a;
+}
+
+.hero-bg-img {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1800&q=80');
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.2) saturate(0.3);
+  z-index: 0;
+  transform: scale(1.05);
+  transition: transform 0.1s ease-out;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(15,23,42,0.3) 0%, transparent 50%, rgba(15,23,42,0.8) 100%);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  padding: 100px 48px 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--neon);
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.2s forwards;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '';
+  width: 40px;
+  height: 1px;
+  background: var(--neon);
+  opacity: 0.5;
+}
+
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(60px, 10vw, 130px);
+  line-height: 0.9;
+  letter-spacing: 2px;
+  color: #ffffff;
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.4s forwards;
+}
+.hero-title .accent { color: var(--red); }
+.hero-title .neon-word {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--neon);
+  opacity: 0.7;
+}
+
+.hero-subtitle {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 18px;
+  color: rgba(255,255,255,0.68);
+  line-height: 2.0;
+  max-width: 700px;
+  margin: 0 auto 40px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.6s forwards;
+}
+
+.hero-ctas {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.8s forwards;
+}
+.btn-primary {
+  padding: 14px 32px;
+  background: var(--red);
+  color: #fff;
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  transition: background 0.3s, transform 0.3s;
+}
+.btn-primary:hover { background: #ff5555; transform: translateY(-2px); }
+.btn-ghost {
+  padding: 14px 32px;
+  border: 1px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.82);
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.btn-ghost:hover { border-color: var(--neon); color: var(--neon); transform: translateY(-2px); }
+
+/* SCROLL INDICATOR */
+.scroll-indicator {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  animation: fadeIn 1s ease 1.5s forwards;
+}
+.scroll-line {
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--neon));
+  animation: scrollPulse 2s ease infinite;
+}
+.scroll-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.45);
+  writing-mode: vertical-rl;
+}
+
+/* STATS TICKER */
+.stats-ticker {
+  position: relative;
+  z-index: 2;
+  background: var(--red);
+  overflow: hidden;
+  padding: 0;
+  width: 100%;
+}
+.ticker-track {
+  display: flex;
+  flex-wrap: nowrap;
+  width: max-content;
+  animation: ticker 30s linear infinite;
+  will-change: transform;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 12px;
+  padding: 14px 40px;
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  color: #ffffff;
+}
+.ticker-sep { color: rgba(255,255,255,0.4); }
+
+/* STAT CARDS ROW */
+.stats-row {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-bottom: 1px solid var(--glass-border);
+}
+.stat-card {
+  padding: 48px 32px;
+  border-right: 1px solid var(--glass-border);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.4s;
+}
+.stat-card:last-child { border-right: none; }
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--glass);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.stat-card:hover::before { opacity: 1; }
+.stat-card:hover .stat-num { color: var(--neon); }
+.stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 64px;
+  line-height: 1;
+  color: var(--text);
+  transition: color 0.4s;
+  display: block;
+}
+.stat-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 8px;
+  display: block;
+}
+.stat-bar-mini {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px;
+  background: var(--red);
+  width: 0;
+  transition: width 1.5s ease;
+}
+
+/* SECTION WRAPPER */
+.section {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 120px 48px;
+}
+
+/* SECTION HEADER */
+.sec-header {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 72px;
+}
+.sec-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 120px;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(0,0,0,0.08);
+  user-select: none;
+  flex-shrink: 0;
+}
+.sec-title-group { flex: 1; }
+.sec-eyebrow {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  color: var(--neon);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+}
+.sec-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 4vw, 56px);
+  letter-spacing: 2px;
+  color: var(--text);
+  line-height: 1;
+}
+.sec-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--glass-border), transparent);
+  margin-bottom: 16px;
+}
+
+/* THREAT CARDS - 3D FLIP */
+.threat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.threat-card-3d {
+  perspective: 1000px;
+  height: 520px;
+  cursor: pointer;
+}
+.threat-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.threat-card-3d:hover .threat-card-inner { transform: rotateY(180deg); }
+.threat-face, .threat-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  padding: 28px;
+  border: 1px solid var(--glass-border);
+  background: var(--dark2);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+}
+.threat-back {
+  transform: rotateY(180deg);
+  background: var(--dark3);
+  border-color: var(--neon);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.threat-icon {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: var(--neon);
+  margin-bottom: 16px;
+  display: block;
+  opacity: 0.85;
+}
+.threat-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.threat-snippet {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.threat-sev {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 16px;
+}
+.sev-dot { width: 8px; height: 8px; border-radius: 50%; }
+.sev-critical .sev-dot { background: var(--red); box-shadow: 0 0 8px var(--red); }
+.sev-high .sev-dot { background: #f97316; box-shadow: 0 0 8px #f97316; }
+.sev-med .sev-dot { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.sev-critical { color: var(--red); }
+.sev-high { color: #f97316; }
+.sev-med { color: var(--gold); }
+.threat-back-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  color: var(--neon);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.threat-back-body {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.85;
+  flex: 1;
+  overflow-y: auto;
+}
+.threat-hint {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-top: auto;
+  padding-top: 16px;
+  opacity: 0.6;
+}
+.threat-accent {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.ta-red { background: var(--red); }
+.ta-orange { background: #f97316; }
+.ta-teal { background: var(--neon); }
+.ta-purple { background: #a855f7; }
+.ta-blue { background: #3b82f6; }
+.ta-gold { background: var(--gold); }
+
+/* IMMERSIVE FULL-BLEED SECTION */
+.immersive-section {
+  position: relative;
+  z-index: 2;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.immersive-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.15) saturate(0.3);
+  transform: scale(1.05);
+  transition: transform 10s ease;
+}
+.immersive-section:hover .immersive-bg { transform: scale(1.0); }
+.immersive-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(5,8,16,0.9) 0%, rgba(5,8,16,0.4) 50%, rgba(5,8,16,0.9) 100%);
+}
+.immersive-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.immersive-quote {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(32px, 3.5vw, 52px);
+  letter-spacing: 1px;
+  line-height: 1.1;
+  color: #fff;
+}
+.immersive-quote .hl { color: var(--red); }
+.immersive-body {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 17px;
+  color: rgba(255,255,255,0.72);
+  line-height: 2.1;
+}
+.immersive-body strong { color: #67e8f9; font-weight: 400; }
+
+/* TIMELINE */
+.timeline {
+  position: relative;
+  padding-left: 48px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px; top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--neon), var(--red), transparent);
+}
+.tl-item {
+  position: relative;
+  margin-bottom: 48px;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.tl-item.visible { opacity: 1; transform: translateX(0); }
+.tl-node {
+  position: absolute;
+  left: -42px;
+  top: 6px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--dark);
+  border: 2px solid var(--neon);
+  box-shadow: 0 0 12px var(--neon);
+}
+.tl-year {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--red);
+  margin-bottom: 4px;
+  display: block;
+}
+.tl-event {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.tl-desc {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 17px;
+  color: var(--muted);
+  line-height: 2.0;
+}
+.tl-tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.tl-tag {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.tag-red { background: rgba(192,57,43,0.08); color: var(--red); border: 1px solid rgba(192,57,43,0.2); }
+.tag-neon { background: rgba(8,145,178,0.08); color: var(--neon); border: 1px solid rgba(8,145,178,0.2); }
+.tag-orange { background: rgba(249,115,22,0.1); color: #c2600a; border: 1px solid rgba(249,115,22,0.2); }
+
+/* VULNERABILITY CHART */
+.chart-section { position: relative; z-index: 2; background: var(--dark2); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); }
+.vuln-chart { display: flex; flex-direction: column; gap: 16px; }
+.chart-row {
+  display: grid;
+  grid-template-columns: 220px 1fr 50px;
+  align-items: center;
+  gap: 20px;
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.chart-row.visible { opacity: 1; transform: translateX(0); }
+.chart-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  color: var(--muted);
+  text-align: right;
+}
+.chart-track {
+  height: 28px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.chart-fill {
+  height: 100%;
+  border-radius: 2px;
+  width: 0;
+  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  font-weight: 600;
+}
+.chart-pct {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--text);
+}
+
+/* PROTOCOL ACCORDION */
+.accordion { display: flex; flex-direction: column; gap: 2px; }
+.acc-item { background: var(--dark2); border: 1px solid var(--glass-border); overflow: hidden; }
+.acc-trigger {
+  width: 100%;
+  padding: 20px 28px;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.3s;
+}
+.acc-trigger:hover { background: var(--glass); }
+.acc-trigger-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.acc-icon-wrap {
+  width: 36px; height: 36px;
+  background: rgba(255,45,45,0.1);
+  border: 1px solid rgba(255,45,45,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.acc-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.acc-sub {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.acc-arrow {
+  font-size: 20px;
+  color: var(--neon);
+  transition: transform 0.3s;
+}
+.acc-item.open .acc-arrow { transform: rotate(45deg); }
+.acc-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.acc-body-inner {
+  padding: 0 28px 28px 40px;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 17px;
+  color: var(--muted);
+  line-height: 2.1;
+  border-top: 1px solid var(--glass-border);
+}
+.acc-risk {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 13px;
+  font-family: 'Syne', sans-serif;
+  color: var(--red);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* DEFENSE GRID */
+.defense-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--glass-border);
+}
+.defense-card {
+  background: var(--dark2);
+  padding: 36px 28px;
+  position: relative;
+  overflow: visible;
+  transition: background 0.4s;
+}
+.defense-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  transform: scaleX(0);
+  transition: transform 0.4s;
+}
+.defense-card:hover { background: var(--dark3); }
+.defense-card:hover::after { transform: scaleX(1); }
+.dc-1::after { background: var(--red); }
+.dc-2::after { background: var(--neon); }
+.dc-3::after { background: var(--gold); }
+.dc-4::after { background: #a855f7; }
+.dc-5::after { background: #3b82f6; }
+.dc-6::after { background: #f97316; }
+.defense-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 64px;
+  color: rgba(0,0,0,0.05);
+  position: absolute;
+  top: 8px; right: 16px;
+  line-height: 1;
+  user-select: none;
+}
+.defense-icon {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  display: block;
+}
+.defense-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.defense-body {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+/* CASE STUDIES */
+.case-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.case-card {
+  background: var(--dark2);
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+  position: relative;
+}
+.case-img-wrap {
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+.case-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.4) saturate(0.5);
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
+.case-card:hover .case-img { transform: scale(1.05); filter: brightness(0.3) saturate(0.3); }
+.case-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--dark2) 0%, transparent 60%);
+}
+.case-year-badge {
+  position: absolute;
+  top: 16px; right: 16px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  color: rgba(255,45,45,0.6);
+  letter-spacing: 2px;
+}
+.case-body { padding: 24px; }
+.case-tag {
+  display: inline-block;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  color: var(--red);
+  border: 1px solid rgba(255,45,45,0.3);
+  padding: 3px 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.case-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.case-text {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 17px;
+  color: var(--muted);
+  line-height: 2.1;
+}
+
+/* EMERGING THREATS */
+.emerging-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+}
+.emerging-item {
+  background: var(--dark2);
+  border: 1px solid var(--glass-border);
+  padding: 32px 36px;
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 32px;
+  align-items: center;
+  transition: background 0.3s, border-color 0.3s;
+  cursor: default;
+}
+.emerging-item:hover { background: var(--dark3); border-color: rgba(255,45,45,0.2); }
+.emerging-year {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  color: var(--red);
+  opacity: 0.4;
+  line-height: 1;
+}
+.emerging-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.emerging-desc {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 17px;
+  color: var(--muted);
+  line-height: 2.0;
+}
+.emerging-status {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.status-watch { background: rgba(255,201,71,0.1); color: var(--gold); border: 1px solid rgba(255,201,71,0.2); }
+.status-active { background: rgba(255,45,45,0.1); color: var(--red); border: 1px solid rgba(255,45,45,0.2); }
+
+/* PHOTO COLLAGE STRIP */
+.photo-strip {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  height: 320px;
+  display: flex;
+  gap: 4px;
+}
+.photo-strip-item {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  transition: flex 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+.photo-strip-item:hover { flex: 2.5; }
+.photo-strip-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.4) grayscale(0.6);
+  transition: filter 0.6s ease, transform 0.6s ease;
+}
+.photo-strip-item:hover .photo-strip-img { filter: brightness(0.6) grayscale(0); transform: scale(1.03); }
+.photo-strip-caption {
+  position: absolute;
+  bottom: 16px; left: 16px; right: 16px;
+  font-family: 'Syne', sans-serif;
+  font-size: 10px;
+  color: rgba(255,255,255,0.6);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s, transform 0.4s;
+}
+.photo-strip-item:hover .photo-strip-caption { opacity: 1; transform: translateY(0); }
+
+/* SOURCES */
+.sources {
+  position: relative;
+  z-index: 2;
+  background: var(--dark2);
+  border-top: 1px solid var(--glass-border);
+}
+.sources-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 48px;
+}
+.sources-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-bottom: 40px;
+}
+.source-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.source-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--glass-border);
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 16px;
+  color: var(--muted);
+}
+.source-row:first-child, .source-row:nth-child(2) { border-top: 1px solid var(--glass-border); }
+.source-idx { color: var(--red); min-width: 24px; }
+.source-link { color: #3b82f6; text-decoration: none; transition: color 0.3s; }
+.source-link:hover { color: var(--neon); }
+
+/* FOOTER */
+footer {
+  position: relative;
+  z-index: 2;
+  background: var(--dark);
+  border-top: 1px solid var(--glass-border);
+  padding: 40px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 3px;
+  color: var(--neon);
+}
+.footer-copy {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* GLITCH EFFECT */
+.glitch {
+  position: relative;
+  isolation: isolate;
+}
+.glitch::before, .glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+.glitch::before {
+  color: var(--neon);
+  clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+  transform: translateX(-2px);
+  animation: glitch1 3s infinite;
+}
+.glitch::after {
+  color: var(--red);
+  clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%);
+  transform: translateX(2px);
+  animation: glitch2 3s infinite;
+}
+
+/* FLOATING BADGE */
+.threat-level-badge {
+  position: fixed;
+  bottom: 32px; right: 32px;
+  z-index: 50;
+  background: rgba(255,45,45,0.1);
+  border: 1px solid var(--red);
+  padding: 12px 20px;
+  backdrop-filter: blur(20px);
+}
+.badge-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: block;
+}
+.badge-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--red);
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.badge-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: pulse-badge 1.5s infinite;
+}
+
+/* 3D CUBE DECORATION */
+.cube-3d {
+  position: absolute;
+  width: 80px; height: 80px;
+  transform-style: preserve-3d;
+  animation: rotateCube 12s linear infinite;
+  opacity: 0.08;
+}
+.cube-face {
+  position: absolute;
+  width: 80px; height: 80px;
+  border: 1px solid var(--neon);
+}
+.cf-front  { transform: translateZ(40px); }
+.cf-back   { transform: rotateY(180deg) translateZ(40px); }
+.cf-left   { transform: rotateY(-90deg) translateZ(40px); }
+.cf-right  { transform: rotateY(90deg) translateZ(40px); }
+.cf-top    { transform: rotateX(90deg) translateZ(40px); }
+.cf-bottom { transform: rotateX(-90deg) translateZ(40px); }
+
+/* SECTION DIVIDER */
+.div-line {
+  position: relative;
+  z-index: 2;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--glass-border), transparent);
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(0.8); }
+  50% { opacity: 1; transform: scaleY(1); }
+}
+@keyframes glitch1 {
+  0%, 90%, 100% { transform: translateX(0); opacity: 0; }
+  91% { transform: translateX(-2px); opacity: 0.8; }
+  93% { transform: translateX(2px); opacity: 0; }
+}
+@keyframes glitch2 {
+  0%, 85%, 100% { transform: translateX(0); opacity: 0; }
+  86% { transform: translateX(2px); opacity: 0.8; }
+  88% { transform: translateX(-2px); opacity: 0; }
+}
+@keyframes rotateCube {
+  from { transform: rotateX(0deg) rotateY(0deg); }
+  to { transform: rotateX(360deg) rotateY(360deg); }
+}
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,45,45,0.4); }
+  50% { opacity: 0.5; box-shadow: 0 0 0 6px rgba(255,45,45,0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-15px) rotate(1deg); }
+  66% { transform: translateY(-8px) rotate(-1deg); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* GRID PATTERN DECORATION */
+.grid-decoration {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,255,231,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,231,0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* REDACTED WORDS */
+.redacted {
+  background: rgba(255,255,255,0.1);
+  color: transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s;
+  padding: 0 4px;
+}
+.redacted:hover { background: rgba(255,201,71,0.2); color: var(--text); }
+.redacted.revealed { background: rgba(255,201,71,0.15); color: var(--gold); }
+
+/* HIGHLIGHT PILL */
+.hl-pill {
+  display: inline-block;
+  background: rgba(255,45,45,0.12);
+  color: var(--red);
+  border: 1px solid rgba(255,45,45,0.2);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}
+.hl-pill.neon { background: rgba(0,255,231,0.08); color: var(--neon); border-color: rgba(0,255,231,0.15); }
+.hl-pill.gold { background: rgba(255,201,71,0.1); color: var(--gold); border-color: rgba(255,201,71,0.2); }
+
+@media (max-width: 900px) {
+  .threat-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .case-grid { grid-template-columns: 1fr; }
+  .defense-grid { grid-template-columns: 1fr; }
+  .immersive-content { grid-template-columns: 1fr; gap: 40px; }
+  .source-list { grid-template-columns: 1fr; }
+  .emerging-item { grid-template-columns: 60px 1fr; }
+  .emerging-status { display: none; }
+  nav { padding: 16px 24px; }
+  .nav-links { display: none; }
+  .section { padding: 80px 24px; }
+  .hero-content { padding: 80px 24px 32px; }
+  .email-sub-row { flex-direction: column; }
+  .email-sub-row .email-input-wrap { width: 100%; }
+}
+
+/* ── EMAIL SUBSCRIPTION SECTION ─────────────────────── */
+.email-section {
+  position: relative;
+  z-index: 2;
+  background: #0f172a;
+  border-top: 1px solid rgba(8,145,178,0.2);
+  border-bottom: 1px solid rgba(8,145,178,0.2);
+  overflow: hidden;
+}
+.email-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(8,145,178,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8,145,178,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+.email-inner {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 96px 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .email-inner { grid-template-columns: 1fr; gap: 40px; padding: 64px 24px; }
+}
+.email-left {}
+.email-eyebrow {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--neon);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.email-eyebrow::before {
+  content: '';
+  width: 32px; height: 1px;
+  background: var(--neon);
+  opacity: 0.5;
+}
+.email-heading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 4vw, 56px);
+  letter-spacing: 2px;
+  color: #ffffff;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+.email-heading .hl-red { color: var(--red); }
+.email-desc {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 17px;
+  color: rgba(255,255,255,0.55);
+  line-height: 2.0;
+  margin-bottom: 28px;
+}
+.email-perks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.email-perk {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.5px;
+}
+.email-perk-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--neon);
+  flex-shrink: 0;
+}
+
+/* Right: form panel */
+.email-right {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(8,145,178,0.18);
+  padding: 40px;
+}
+.email-form-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 28px;
+}
+.email-tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 28px;
+}
+.email-tab {
+  flex: 1;
+  padding: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+.email-tab.active {
+  background: rgba(8,145,178,0.12);
+  border-color: var(--neon);
+  color: var(--neon);
+}
+.email-tab:hover:not(.active) {
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.7);
+}
+.email-form-panel { display: none; }
+.email-form-panel.active { display: block; }
+.email-field {
+  margin-bottom: 16px;
+}
+.email-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  display: block;
+  margin-bottom: 8px;
+}
+.email-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 12px 16px;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+  outline: none;
+  transition: border-color 0.3s, background 0.3s;
+  appearance: none;
+}
+.email-input:focus {
+  border-color: var(--neon);
+  background: rgba(8,145,178,0.06);
+}
+.email-input::placeholder { color: rgba(255,255,255,0.25); }
+.email-select {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 12px 16px;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+  outline: none;
+  transition: border-color 0.3s;
+  cursor: pointer;
+  appearance: none;
+}
+.email-select:focus { border-color: var(--neon); }
+.email-select option { background: #0f172a; color: rgba(255,255,255,0.85); }
+.email-submit {
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--neon);
+  color: #fff;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  margin-top: 8px;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+.email-submit:hover { background: var(--neon-dim); transform: translateY(-1px); }
+.email-submit-enq {
+  background: var(--red);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+.email-submit-enq:hover { background: var(--red-dim); }
+.email-note {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.25);
+  margin-top: 12px;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+}
+.email-success {
+  display: none;
+  text-align: center;
+  padding: 32px 0;
+}
+.email-success-icon {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  color: var(--neon);
+  letter-spacing: 2px;
+  display: block;
+  margin-bottom: 12px;
+}
+.email-success-msg {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 1px;
+  line-height: 1.8;
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Background Canvas -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- Floating Threat Level Badge -->
+<div class="threat-level-badge">
+  <span class="badge-label">Threat Level</span>
+  <div class="badge-value">
+    <span class="badge-dot"></span>
+    CRITICAL
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">IIoT://SEC</div>
+  <ul class="nav-links">
+    <li><a href="#threats">Threats</a></li>
+    <li><a href="#timeline">Timeline</a></li>
+    <li><a href="#protocols">Protocols</a></li>
+    <li><a href="#defense">Defense</a></li>
+    <li><a href="#emerging">Emerging</a></li>
+  </ul>
+  <a href="#defense" class="nav-cta">GET PROTECTED →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-img" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+  <div class="grid-decoration"></div>
+
+  <!-- Floating 3D cubes -->
+  <div class="cube-3d" style="position:absolute;top:20%;left:8%;animation-duration:15s;">
+    <div class="cube-face cf-front"></div><div class="cube-face cf-back"></div>
+    <div class="cube-face cf-left"></div><div class="cube-face cf-right"></div>
+    <div class="cube-face cf-top"></div><div class="cube-face cf-bottom"></div>
+  </div>
+  <div class="cube-3d" style="position:absolute;bottom:25%;right:10%;animation-duration:20s;animation-direction:reverse;opacity:0.05;">
+    <div class="cube-face cf-front"></div><div class="cube-face cf-back"></div>
+    <div class="cube-face cf-left"></div><div class="cube-face cf-right"></div>
+    <div class="cube-face cf-top"></div><div class="cube-face cf-bottom"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span>Industrial Cybersecurity Report</span>
+    </div>
+    <h1 class="hero-title glitch" data-text="IIOT UNDER SIEGE">
+      <span class="neon-word">IIOT</span> UNDER<br><span class="accent">SIEGE</span>
+    </h1>
+    <p class="hero-subtitle">
+      The industrial systems that generate electricity, purify drinking water, and run factory floors were never built with network security in mind. They were built to last decades — and they have. What changed around them is everything else: connectivity, adversarial intent, and the geopolitical calculus that now treats critical infrastructure as a legitimate target. The gap between how these systems were designed and the environment they now operate in is where the modern threat lives.
+    </p>
+    <div class="hero-ctas">
+      <a href="#threats" class="btn-primary">EXPLORE THREATS</a>
+      <a href="#defense" class="btn-ghost">DEFENSE GUIDE</a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">SCROLL</span>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="stats-ticker">
+  <div class="ticker-track" id="ticker">
+    <span class="ticker-item">36B+ IIoT DEVICES ONLINE <span class="ticker-sep">///</span></span>
+    <span class="ticker-item">140% SURGE IN OT ATTACKS <span class="ticker-sep">///</span></span>
+    <span class="ticker-item">$4.7B IN CRITICAL INFRA DAMAGES <span class="ticker-sep">///</span></span>
+    <span class="ticker-item">57% OF DEVICES HAVE UNPATCHED VULNS <span class="ticker-sep">///</span></span>
+    <span class="ticker-item">ENERGY + MANUFACTURING MOST TARGETED <span class="ticker-sep">///</span></span>
+    <span class="ticker-item">ZERO TRUST IS NO LONGER OPTIONAL <span class="ticker-sep">///</span></span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item">36B+ IIoT DEVICES ONLINE <span class="ticker-sep">///</span></span>
+    <span class="ticker-item">140% SURGE IN OT ATTACKS <span class="ticker-sep">///</span></span>
+    <span class="ticker-item">$4.7B IN CRITICAL INFRA DAMAGES <span class="ticker-sep">///</span></span>
+    <span class="ticker-item">57% OF DEVICES HAVE UNPATCHED VULNS <span class="ticker-sep">///</span></span>
+    <span class="ticker-item">ENERGY + MANUFACTURING MOST TARGETED <span class="ticker-sep">///</span></span>
+    <span class="ticker-item">ZERO TRUST IS NO LONGER OPTIONAL <span class="ticker-sep">///</span></span>
+  </div>
+</div>
+
+<!-- STAT CARDS -->
+<div class="stats-row reveal" id="statsRow">
+  <div class="stat-card">
+    <span class="stat-num" id="s1">0</span>
+    <span class="stat-label">IIoT Devices Connected Globally</span>
+    <div class="stat-bar-mini" style="background:var(--neon)" id="sb1"></div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-num" id="s2">0%</span>
+    <span class="stat-label">Surge in OT Cyberattacks</span>
+    <div class="stat-bar-mini" style="background:var(--red)" id="sb2"></div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-num" id="s3">$0B</span>
+    <span class="stat-label">Cost of Critical Infra Breaches</span>
+    <div class="stat-bar-mini" style="background:var(--gold)" id="sb3"></div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-num" id="s4">0%</span>
+    <span class="stat-label">Devices with Unpatched Vulnerabilities</span>
+    <div class="stat-bar-mini" style="background:#a855f7" id="sb4"></div>
+  </div>
+</div>
+
+<!-- THREAT CARDS -->
+<section class="section" id="threats">
+  <div class="sec-header reveal">
+    <span class="sec-num">01</span>
+    <div class="sec-title-group">
+      <span class="sec-eyebrow">Primary Attack Vectors</span>
+      <h2 class="sec-title">THE THREAT LANDSCAPE</h2>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="threat-grid">
+    <div class="threat-card-3d reveal" style="transition-delay:0.1s">
+      <div class="threat-card-inner">
+        <div class="threat-face">
+          <div class="threat-accent ta-red"></div>
+          <span class="threat-icon">RANSOMWARE</span>
+          <div class="threat-title">Ransomware on OT Networks</div>
+          <div class="threat-snippet">Ransomware groups have shifted focus from enterprise IT to industrial control environments, where encrypting a single PLC or HMI can bring an entire production facility to a standstill. Average operational downtime following an ICS ransomware incident extends to 23 days, with ransom demands averaging $1.9 million.</div>
+          <div class="threat-sev sev-critical"><span class="sev-dot"></span>CRITICAL</div>
+          <div class="threat-hint">HOVER TO FLIP FOR DETAILS</div>
+        </div>
+        <div class="threat-back">
+          <div class="threat-back-title">// DEEP DIVE</div>
+          <div class="threat-back-body">What distinguishes modern ICS ransomware from earlier variants is not merely increased sophistication but deliberate industrial targeting. EKANS was constructed to enumerate and terminate specific OT process names before initiating encryption — a capability that required its developers to understand industrial control architectures in meaningful detail. When more than 60 critical infrastructure operators reported ransom payments exceeding ten million dollars apiece in 2023, it confirmed that threat actors had accurately assessed the operational cost of extended downtime and priced their demands accordingly. Entry most commonly occurs through USB delivery into air-gapped environments or through compromised software from a trusted industrial vendor.</div>
+          <div class="hl-pill" style="margin-top:16px">EKANS / SNAKE</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="threat-card-3d reveal" style="transition-delay:0.2s">
+      <div class="threat-card-inner">
+        <div class="threat-face">
+          <div class="threat-accent ta-orange"></div>
+          <span class="threat-icon">NATION-STATE</span>
+          <div class="threat-title">Nation-State APTs</div>
+          <div class="threat-snippet">State-sponsored groups such as Volt Typhoon, Sandworm, and TEMP.Veles have demonstrated the capacity to embed themselves inside critical industrial infrastructure for years, waiting for the geopolitical moment to act.</div>
+          <div class="threat-sev sev-critical"><span class="sev-dot"></span>CRITICAL</div>
+          <div class="threat-hint">HOVER TO FLIP FOR DETAILS</div>
+        </div>
+        <div class="threat-back">
+          <div class="threat-back-title">// DEEP DIVE</div>
+          <div class="threat-back-body">The distinction that matters most about groups like Volt Typhoon, Sandworm, and TEMP.Veles is not their technical sophistication but their patience and intent. CISA's 2024 confirmation that Volt Typhoon operated inside US critical infrastructure undetected for as long as five years signals an adversarial approach that conventional detection tools were not built to identify. TEMP.Veles crossed a different threshold with the TRITON deployment: it represented an operational decision that causing industrial casualties through safety system sabotage was an acceptable strategic objective. Across both cases, the technique of using legitimate system tools to navigate victim networks — leaving minimal forensic trace — made attribution and detection exceptionally difficult.</div>
+          <div class="hl-pill" style="margin-top:16px">TRITON / TRISIS</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="threat-card-3d reveal" style="transition-delay:0.3s">
+      <div class="threat-card-inner">
+        <div class="threat-face">
+          <div class="threat-accent ta-teal"></div>
+          <span class="threat-icon">SUPPLY CHAIN</span>
+          <div class="threat-title">Supply Chain Attacks</div>
+          <div class="threat-snippet">Attackers increasingly target ICS vendors and technology suppliers, embedding malicious code into firmware updates, software libraries, and hardware components before they ever reach the end customer.</div>
+          <div class="threat-sev sev-critical"><span class="sev-dot"></span>CRITICAL</div>
+          <div class="threat-hint">HOVER TO FLIP FOR DETAILS</div>
+        </div>
+        <div class="threat-back">
+          <div class="threat-back-title">// DEEP DIVE</div>
+          <div class="threat-back-body">Supply chain compromise is particularly effective against industrial environments because it exploits the trust that OT operators must have with their equipment vendors. A device arriving from a known manufacturer with valid firmware signatures is, by every conventional measure, a trusted asset. What the SolarWinds case established was that this trust can be subverted at the vendor level without any indicator reaching the end operator. In ICS environments, where vendors retain privileged access for maintenance and remote diagnostics, a compromised vendor relationship translates directly into persistent attacker access to physical process control — with no initial foothold required in the operator's own network.</div>
+          <div class="hl-pill" style="margin-top:16px">SOLARWINDS PATTERN</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="threat-card-3d reveal" style="transition-delay:0.1s">
+      <div class="threat-card-inner">
+        <div class="threat-face">
+          <div class="threat-accent ta-purple"></div>
+          <span class="threat-icon">DEFAULT CREDS</span>
+          <div class="threat-title">Default Credential Exploitation</div>
+          <div class="threat-snippet">More than 90 percent of internet-exposed IIoT devices operate with factory-default or hardcoded credentials. Search engines such as Shodan index millions of such devices every day. An attacker with basic technical knowledge can gain unauthorized access to live industrial systems in a matter of seconds.</div>
+          <div class="threat-sev sev-high"><span class="sev-dot"></span>HIGH</div>
+          <div class="threat-hint">HOVER TO FLIP FOR DETAILS</div>
+        </div>
+        <div class="threat-back">
+          <div class="threat-back-title">// DEEP DIVE</div>
+          <div class="threat-back-body">The persistence of default credential vulnerabilities in industrial devices reflects a market structure problem as much as a technical one. Manufacturers faced no commercial pressure to change default credentials because their industrial customers — focused on operational reliability, not security — rarely demanded it. The result is an installed base of millions of devices whose credentials have never changed since leaving the factory, all discoverable through public scanning tools that report their locations in real time. Mirai variants continue exploiting this because it works: credentials are known, devices are findable, and operators are unlikely to notice until service has already been disrupted or a pivot into the OT network has occurred.</div>
+          <div class="hl-pill" style="margin-top:16px">MIRAI VARIANT</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="threat-card-3d reveal" style="transition-delay:0.2s">
+      <div class="threat-card-inner">
+        <div class="threat-face">
+          <div class="threat-accent ta-blue"></div>
+          <span class="threat-icon">IT / OT</span>
+          <div class="threat-title">IT/OT Convergence Risk</div>
+          <div class="threat-snippet">The network isolation that historically protected operational technology from internet-borne threats has effectively collapsed. As Industry 4.0 integration bridges IT and OT environments, malware originating in enterprise systems now has a direct path to programmable logic controllers and SCADA systems.</div>
+          <div class="threat-sev sev-high"><span class="sev-dot"></span>HIGH</div>
+          <div class="threat-hint">HOVER TO FLIP FOR DETAILS</div>
+        </div>
+        <div class="threat-back">
+          <div class="threat-back-title">// DEEP DIVE</div>
+          <div class="threat-back-body">For most of the industrial internet's existence, the premise that OT systems were protected by physical isolation held. IT-to-OT pathways existed but were narrow and deliberately controlled. Industry 4.0 dissolved this progressively and often without formal security review of the implications. The NotPetya case made the cost visible: malware designed with no ICS capability produced roughly ten billion dollars in industrial damage because IT-OT boundaries had eroded to the point where propagation was uninhibited. The convergence has not slowed since, meaning that an IT-side compromise now routinely presents an attacker with a pathway to operational systems that no network diagram of ten years ago would have shown.</div>
+          <div class="hl-pill" style="margin-top:16px">NOTPETYA EFFECT</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="threat-card-3d reveal" style="transition-delay:0.3s">
+      <div class="threat-card-inner">
+        <div class="threat-face">
+          <div class="threat-accent ta-gold"></div>
+          <span class="threat-icon">INSIDER</span>
+          <div class="threat-title">Insider Threats</div>
+          <div class="threat-snippet">Personnel and contractors with authorized access to operational technology systems represent a threat category that is simultaneously the highest in potential impact and the most difficult to detect through conventional technical controls.</div>
+          <div class="threat-sev sev-med"><span class="sev-dot"></span>MEDIUM-HIGH</div>
+          <div class="threat-hint">HOVER TO FLIP FOR DETAILS</div>
+        </div>
+        <div class="threat-back">
+          <div class="threat-back-title">// DEEP DIVE</div>
+          <div class="threat-back-body">Insider threats in OT environments present a detection problem that differs fundamentally from the IT equivalent. In enterprise systems, user behavior analytics can flag anomalies against established baselines. In industrial networks, operators regularly perform actions that would appear extraordinary in an IT context — taking systems offline, modifying control parameters, bypassing safety interlocks for maintenance. The baseline for legitimate behavior is wide enough that malicious activity can shelter within it. Documented cases of manufacturing employees causing intentional equipment damage share a common characteristic: the actions were operationally plausible at the moment they occurred, and were only identified as malicious in retrospect.</div>
+          <div class="hl-pill" style="margin-top:16px">BEHAVIORAL RISK</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHOTO STRIP -->
+<div class="photo-strip">
+  <div class="photo-strip-item">
+    <img class="photo-strip-img" src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80" alt="Industrial control room">
+    <div class="photo-strip-caption">SCADA Control Room — Power Grid Operations</div>
+  </div>
+  <div class="photo-strip-item">
+    <img class="photo-strip-img" src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80" alt="Circuit board">
+    <div class="photo-strip-caption">IIoT Hardware — Embedded Systems</div>
+  </div>
+  <div class="photo-strip-item">
+    <img class="photo-strip-img" src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80" alt="Network cables">
+    <div class="photo-strip-caption">OT Network Infrastructure — Industrial LAN</div>
+  </div>
+  <div class="photo-strip-item">
+    <img class="photo-strip-img" src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80" alt="Cybersecurity">
+    <div class="photo-strip-caption">Threat Monitoring — SOC Operations</div>
+  </div>
+  <div class="photo-strip-item">
+    <img class="photo-strip-img" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80" alt="Power plant">
+    <div class="photo-strip-caption">Critical Infrastructure — Energy Sector</div>
+  </div>
+</div>
+
+<!-- IMMERSIVE QUOTE SECTION -->
+<div class="immersive-section">
+  <div class="immersive-bg" style="background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=1800&q=80')"></div>
+  <div class="immersive-overlay"></div>
+  <div class="immersive-content">
+    <div class="immersive-quote reveal">
+      "EVERY DECADE OF NEGLECTED SECURITY IN INDUSTRIAL SYSTEMS IS NOW A DECADE OF <span class="hl">INHERITED VULNERABILITY</span> THAT DEFENDERS MUST OVERCOME FROM A STANDING START."
+    </div>
+    <div class="immersive-body reveal" style="transition-delay:0.3s">
+      <p>What is distinctive about the Industrial Internet of Things is not its scale — though at over 36 billion connected endpoints it is vast — but the gap between its origins and its current reality. The protocols that industrial networks run on today were finalized when the personal computer was a novelty. Modbus arrived in <strong>1979</strong>; the SCADA standards that followed came through the <strong>1980s</strong>. Both were engineered for isolated, purpose-built environments where the only people with access were the technicians standing in the room. That assumption no longer holds, and the protocols themselves have not changed.</p>
+      <br>
+      <p>Connecting legacy OT systems to modern networks did not make them smarter — it made them reachable. An industrial controller running <strong>twenty-year-old firmware</strong> is now as accessible to a remote attacker as any web server, but without firewalls, authentication requirements, or a security team that existed when the controller was commissioned. The result is an attack surface that grows every year as more devices are connected, while the underlying systems remain fundamentally unchanged.</p>
+      <br>
+      <div class="hl-pill">Dragos OT/ICS Report 2024</div>
+    </div>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<section class="section" id="timeline">
+  <div class="sec-header reveal">
+    <span class="sec-num">02</span>
+    <div class="sec-title-group">
+      <span class="sec-eyebrow">Major Incidents & Turning Points</span>
+      <h2 class="sec-title">ATTACK TIMELINE</h2>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-node"></div>
+      <span class="tl-year">2010</span>
+      <div class="tl-event">Stuxnet — The First Cyber Weapon</div>
+      <p class="tl-desc">What Stuxnet established, with unmistakable permanence, was that the boundary separating cyber conflict from physical warfare had dissolved. A worm exploiting four previously undisclosed vulnerabilities was directed at Siemens S7-315 and S7-417 controllers managing centrifuges at the Natanz enrichment facility in Iran. Rather than destroying equipment outright, it manipulated rotor speeds in patterns designed to cause mechanical failure while simultaneously feeding false normality to plant monitoring systems. The operators watching those screens had no indication that anything was wrong until the damage was done. The operation, attributed to a US-Israeli joint programme, accomplished through software what previously would have required a physical strike — and did so invisibly.</p>
+      <div class="tl-tags">
+        <span class="tl-tag tag-red">NATION-STATE</span>
+        <span class="tl-tag tag-neon">ZERO-DAY × 4</span>
+        <span class="tl-tag tag-orange">NUCLEAR</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-node"></div>
+      <span class="tl-year">2015–2016</span>
+      <div class="tl-event">Ukraine Power Grid Attacks (BlackEnergy / Industroyer)</div>
+      <p class="tl-desc">The Ukrainian grid attacks of 2015 and 2016 rewrote the threat model for electrical infrastructure operators worldwide. The first event — a coordinated outage affecting approximately 225,000 people, orchestrated through the BlackEnergy malware framework by the group subsequently attributed to GRU Unit 74455 — was consequential in itself. The second was categorically more serious: Industroyer, the tool deployed the following year, was purpose-built to speak directly to power grid control protocols and issue commands to substation equipment. It came within a software defect of permanently damaging transformers whose replacement lead time is measured in months. The attack demonstrated that an adversary could now threaten grid infrastructure not as a side effect of compromise, but as the primary operational objective.</p>
+      <div class="tl-tags">
+        <span class="tl-tag tag-red">SANDWORM / GRU</span>
+        <span class="tl-tag tag-neon">POWER GRID</span>
+        <span class="tl-tag tag-orange">225K AFFECTED</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-node"></div>
+      <span class="tl-year">2017</span>
+      <div class="tl-event">TRITON — Targeting Safety Systems</div>
+      <p class="tl-desc">No cyberattack documented to date has come as close to deliberately killing people as TRITON. Discovered during incident response at a petrochemical facility in the Middle East in 2017, the malware framework was built to interact with Schneider Electric Triconex Safety Instrumented Systems — the devices whose sole function is to initiate emergency shutdowns when process conditions become dangerous. The operational logic was clear: disable the safety layer first, then trigger the hazardous condition. Only an error in the malware's own code prevented the attack from reaching its intended outcome. The group behind it, subsequently identified as TEMP.Veles with links to a Russian government research institute, had apparently concluded that engineering a civilian industrial catastrophe was a legitimate strategic tool.</p>
+      <div class="tl-tags">
+        <span class="tl-tag tag-red">SAFETY SYSTEMS</span>
+        <span class="tl-tag tag-neon">PETROCHEMICAL</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-node"></div>
+      <span class="tl-year">2021</span>
+      <div class="tl-event">Oldsmar Water Treatment Poisoning Attempt</div>
+      <p class="tl-desc">What stopped a chemical poisoning of 15,000 Floridians in February 2021 was not a firewall, not an intrusion detection system, and not a security policy. It was an operator who noticed a cursor moving across a screen without anyone touching the mouse. The attacker had reached Oldsmar's water treatment Human-Machine Interface through a TeamViewer installation left running on an unmonitored workstation, its credentials shared across the department. Sodium hydroxide concentrations were raised from 111 parts per million to a potentially lethal 11,100 before the change was manually reversed. Post-incident examination found no network monitoring, no VPN requirement for remote access, no multi-factor authentication, and Windows 7 running on control terminals. The facility's security posture relied entirely on the assumption that nobody would ever look for it.</p>
+      <div class="tl-tags">
+        <span class="tl-tag tag-red">WATER SUPPLY</span>
+        <span class="tl-tag tag-neon">TEAMVIEWER</span>
+        <span class="tl-tag tag-orange">15K AT RISK</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-node"></div>
+      <span class="tl-year">2021</span>
+      <div class="tl-event">Colonial Pipeline Ransomware</div>
+      <p class="tl-desc">The most consequential finding from Colonial Pipeline's 2021 compromise was not the ransom figure but the mechanism of disruption: a pipeline operator shut down 5,500 miles of critical fuel infrastructure not because attackers had touched the control systems, but because they might. The DarkSide group had accessed only the IT network, gaining entry through a single VPN account lacking multi-factor authentication. The operational shutdown was a preemptive decision, made under uncertainty, that produced the largest domestic fuel supply disruption in recent US history. Panic purchasing emptied filling stations across 17 states. The FBI recovered roughly $2.3 million of the $4.4 million ransom from a seized wallet, but the more significant recovery was the lesson: perimeter boundaries between IT and OT that exist only in policy documents provide no operational protection.</p>
+      <div class="tl-tags">
+        <span class="tl-tag tag-red">DARKSIDE</span>
+        <span class="tl-tag tag-orange">$4.4M RANSOM</span>
+        <span class="tl-tag tag-neon">FUEL SHORTAGE</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-node"></div>
+      <span class="tl-year">2024</span>
+      <div class="tl-event">Volt Typhoon — Silent Pre-Positioning</div>
+      <p class="tl-desc">Volt Typhoon fundamentally changed how security strategists think about persistent threat actors in critical infrastructure. The group, attributed to the People's Republic of China, was not stealing data. It was not disabling systems. A joint advisory from CISA, the FBI, and allied intelligence partners in 2024 confirmed that Volt Typhoon had maintained access across energy, water, transportation, and telecommunications sectors for periods reaching five years without triggering the alert thresholds of organizations actively seeking threats. The strategic framing offered by the advisory was explicit: the objective was pre-positioning, not current exploitation — establishing the capability to cause serious disruption to US infrastructure at a moment of geopolitical choice, potentially years in the future. It represented a form of deterrence infrastructure, built quietly inside the networks of the country it was intended to threaten.</p>
+      <div class="tl-tags">
+        <span class="tl-tag tag-red">VOLT TYPHOON / APT40</span>
+        <span class="tl-tag tag-neon">5-YEAR PERSISTENCE</span>
+        <span class="tl-tag tag-orange">MULTI-SECTOR</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VULNERABILITY CHART -->
+<div class="chart-section">
+  <div class="section" style="padding-top:80px;padding-bottom:80px">
+    <div class="sec-header reveal">
+      <span class="sec-num">03</span>
+      <div class="sec-title-group">
+        <span class="sec-eyebrow">ICS-CERT Data 2023–2024</span>
+        <h2 class="sec-title">TOP VULNERABILITY CLASSES</h2>
+      </div>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="vuln-chart" id="vulnChart">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- CASE STUDIES SECTION -->
+<section class="section" id="incidents">
+  <div class="sec-header reveal">
+    <span class="sec-num">04</span>
+    <div class="sec-title-group">
+      <span class="sec-eyebrow">Real-World Incidents</span>
+      <h2 class="sec-title">CASE STUDIES</h2>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="case-grid">
+    <div class="case-card reveal">
+      <div class="case-img-wrap">
+        <img class="case-img" src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80" alt="Power plant">
+        <div class="case-img-overlay"></div>
+        <div class="case-year-badge">2021</div>
+      </div>
+      <div class="case-body">
+        <div class="case-tag">ENERGY SECTOR</div>
+        <div class="case-title">Colonial Pipeline — $4.4M Ransom & National Emergency</div>
+        <p class="case-text">Few cybersecurity incidents have illustrated the distance between theoretical risk and operational consequence as clearly as Colonial Pipeline. The compromise itself was unremarkable by technical standards: a single VPN account, never enrolled in multi-factor authentication, gave the DarkSide group access to Colonial's IT environment. What followed was remarkable. Colonial's operators, unable to determine whether ransomware had crossed into operational systems, shut down pipeline infrastructure preemptively — 5,500 miles of it, supplying roughly 45 percent of East Coast fuel needs. The shutdown was a rational response to uncertainty, and it produced the largest domestic fuel supply disruption in living memory. The FBI later recovered approximately $2.3 million of the $4.4 million ransom from a seized cryptocurrency wallet, but the more durable lesson was simpler: IT-OT separation that exists as policy rather than architecture provides no operational safety margin when it is needed most.</p>
+      </div>
+    </div>
+    <div class="case-card reveal" style="transition-delay:0.2s">
+      <div class="case-img-wrap">
+        <img class="case-img" src="https://images.unsplash.com/photo-1624969862293-b749659ccc4e?w=800&q=80" alt="Water treatment">
+        <div class="case-img-overlay"></div>
+        <div class="case-year-badge">2021</div>
+      </div>
+      <div class="case-body">
+        <div class="case-tag">WATER TREATMENT</div>
+        <div class="case-title">Oldsmar Water Plant — Lye Spike of 100×</div>
+        <p class="case-text">Security professionals studying the Oldsmar incident tend to arrive at the same conclusion: the attack succeeded not because of technical sophistication but because it did not need any. TeamViewer had been installed on the water treatment facility's control workstation and was never removed. Its credentials were shared among staff. The HMI it provided access to was directly reachable from the internet with no VPN interposed. When an unauthorized user raised sodium hydroxide concentrations from 111 to 11,100 parts per million — a level that could have caused serious harm to 15,000 people — the only mechanism that prevented it from taking effect was a human being who happened to be watching the screen. Post-incident review confirmed the absence of any automated detection: no monitoring tools, no segmented network, and a control system running Windows 7 software that had been out of support for over a year.</p>
+      </div>
+    </div>
+    <div class="case-card reveal" style="transition-delay:0.1s">
+      <div class="case-img-wrap">
+        <img class="case-img" src="https://images.unsplash.com/photo-1592659762303-90081d34b277?w=800&q=80" alt="Hospital">
+        <div class="case-img-overlay"></div>
+        <div class="case-year-badge">2023</div>
+      </div>
+      <div class="case-body">
+        <div class="case-tag">HEALTHCARE / OT</div>
+        <div class="case-title">Ransomware on Hospital Building Systems</div>
+        <p class="case-text">Healthcare facilities have long treated building automation systems as a facilities management concern rather than a cybersecurity one. The HVAC controllers, elevator systems, and fire suppression networks governed by BACnet do not appear on most security teams' asset inventories, and they rarely receive the scrutiny applied to servers or clinical workstations. A pattern of ransomware incidents targeting US hospital networks in 2023 exposed the consequences of this classification. Attackers accessed BACnet-connected building systems through pathways that clinical security monitoring was not configured to observe, then used those footholds to reach clinical networks, encrypt patient data, and force postponements of scheduled procedures. The incidents established that in healthcare environments, the boundary of the security perimeter must extend to every networked system in the building — not only those carrying patient data.</p>
+      </div>
+    </div>
+    <div class="case-card reveal" style="transition-delay:0.3s">
+      <div class="case-img-wrap">
+        <img class="case-img" src="https://images.unsplash.com/photo-1565108253264-5c08e30e5f63?w=800&q=80" alt="Factory floor">
+        <div class="case-img-overlay"></div>
+        <div class="case-year-badge">2022</div>
+      </div>
+      <div class="case-body">
+        <div class="case-tag">MANUFACTURING</div>
+        <div class="case-title">Toyota Supplier Attack — 14,000 Cars Lost</div>
+        <p class="case-text">Toyota's 2022 production suspension posed a question that just-in-time manufacturing executives had long preferred not to examine directly: how much operational resilience exists when a single digitally connected supplier fails? The answer, in the case of Kojima Industries — a supplier of plastic components whose ransomware attack Toyota could not work around — was none. All 14 domestic manufacturing facilities suspended operations simultaneously for a full day. Approximately 13,000 vehicles were removed from the production schedule as a direct result. Toyota's own systems were untouched. The lesson was not about Toyota's security posture but about the structural fragility of supply chains in which operational continuity depends on real-time digital connectivity to suppliers who may carry considerably less security investment than their customers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROTOCOLS -->
+<section class="section" id="protocols" style="padding-top:0">
+  <div class="sec-header reveal">
+    <span class="sec-num">05</span>
+    <div class="sec-title-group">
+      <span class="sec-eyebrow">Legacy & Modern ICS Protocols</span>
+      <h2 class="sec-title">VULNERABLE PROTOCOLS</h2>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="accordion reveal" id="protoAccordion">
+    <!-- JS populated -->
+  </div>
+</section>
+
+<!-- DEFENSE -->
+<section class="section" id="defense" style="background:var(--dark2);padding-top:120px;padding-bottom:120px;max-width:100%">
+  <div style="max-width:1200px;margin:0 auto;padding:0 48px">
+    <div class="sec-header reveal">
+      <span class="sec-num">06</span>
+      <div class="sec-title-group">
+        <span class="sec-eyebrow">Hardening Your Industrial Infrastructure</span>
+        <h2 class="sec-title">DEFENSE STRATEGIES</h2>
+      </div>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="defense-grid">
+      <div class="defense-card dc-1 reveal">
+        <div class="defense-num">01</div>
+        <span class="defense-icon">SEGMENTATION</span>
+        <div class="defense-title">Network Segmentation</div>
+        <p class="defense-body">Effective network segmentation requires the physical and logical isolation of operational technology environments from enterprise IT networks through the deployment of demilitarized zones, data diodes, and restrictive firewall rule sets. Established frameworks including the Purdue Model and the ISA-95 standard provide hierarchical zoning architectures that contain lateral movement within defined network segments. The objective of segmentation is categorical: a security incident that begins in the business network must be architecturally prevented from propagating to process control systems on the shop floor.</p>
+      </div>
+      <div class="defense-card dc-2 reveal" style="transition-delay:0.1s">
+        <div class="defense-num">02</div>
+        <span class="defense-icon">MONITORING</span>
+        <div class="defense-title">Continuous OT Monitoring</div>
+        <p class="defense-body">Visibility into operational technology network activity requires purpose-built intrusion detection systems that understand industrial protocols and can distinguish anomalous behavior from normal operations. Platforms such as Dragos, Claroty, and Nozomi Networks provide passive monitoring capabilities that build a baseline of expected OT network behavior and generate alerts when deviations occur. Passive monitoring is essential in OT environments because active scanning can disrupt the timing-sensitive communications of industrial control systems, potentially causing equipment faults or process interruptions.</p>
+      </div>
+      <div class="defense-card dc-3 reveal" style="transition-delay:0.2s">
+        <div class="defense-num">03</div>
+        <span class="defense-icon">PATCHING</span>
+        <div class="defense-title">Risk-Based Patch Management</div>
+        <p class="defense-body">Patch management in operational technology environments cannot follow the same cadence applied to enterprise IT systems. Industrial equipment typically operates on maintenance windows measured in months or years, and firmware updates must be tested against production-equivalent configurations before deployment. In the interim, virtual patching via IDS signatures provides a viable protective measure. Vulnerabilities should be prioritized according to their CVSS severity score, network exposure, and the criticality of the affected system to ongoing operations.</p>
+      </div>
+      <div class="defense-card dc-4 reveal" style="transition-delay:0.1s">
+        <div class="defense-num">04</div>
+        <span class="defense-icon">ZERO TRUST</span>
+        <div class="defense-title">Zero Trust for OT</div>
+        <p class="defense-body">The zero trust security model requires that access to operational technology systems be granted on the principle of least privilege, meaning each user, service, and device receives only the permissions strictly required for its defined function. Multi-factor authentication must be enforced for all remote access sessions into OT networks; VPN-only controls have repeatedly proven insufficient in documented incidents. Shared credentials, default passwords, and long-lived access accounts must be systematically eliminated and replaced with individually attributed credentials subject to regular rotation.</p>
+      </div>
+      <div class="defense-card dc-5 reveal" style="transition-delay:0.2s">
+        <div class="defense-num">05</div>
+        <span class="defense-icon">INVENTORY</span>
+        <div class="defense-title">Complete Asset Inventory</div>
+        <p class="defense-body">Effective security for any environment begins with comprehensive and accurate knowledge of what exists within it. In IIoT environments, where devices have accumulated over decades, often without central registration, building this inventory presents a substantial challenge. Passive discovery tools including those offered by Dragos and Claroty can identify connected devices, enumerate their firmware versions, and map network communication relationships without sending any active probes that might disrupt industrial processes.</p>
+      </div>
+      <div class="defense-card dc-6 reveal" style="transition-delay:0.3s">
+        <div class="defense-num">06</div>
+        <span class="defense-icon">IEC 62443</span>
+        <div class="defense-title">Secure by Design (IEC 62443)</div>
+        <p class="defense-body">IEC 62443 is the international standard series governing cybersecurity requirements for industrial automation and control systems. Procuring organizations should embed IEC 62443 compliance requirements into vendor contracts, requiring evidence of security certification, support for secure boot, implementation of encrypted communications channels, and the provision of authenticated firmware update mechanisms. Security must be established as a contractual and procurement requirement, not treated as a feature to be retrofitted after deployment.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECOND IMMERSIVE -->
+<div class="immersive-section">
+  <div class="immersive-bg" style="background-image: url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1800&q=80')"></div>
+  <div class="immersive-overlay"></div>
+  <div class="immersive-content">
+    <div class="immersive-body reveal">
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:3px;color:var(--neon);margin-bottom:12px">THE NUMBERS DON'T LIE</p>
+      <p>IBM's 2024 breach research placed the mean time to detect an operational technology compromise at approximately <strong>200 days</strong>. That figure deserves to be held alongside a contrasting one: the timeline for physically damaging a high-voltage power transformer in a way that requires replacement, not repair, can be as short as four hours of deliberate misuse. This disparity — between how long attackers can remain hidden and how quickly they can act — is the central asymmetry that makes ICS security categorically harder than conventional enterprise defense.</p>
+      <br>
+      <p>There is also a category difference in what is at stake. When a financial services firm suffers a data breach, the harm is real but bounded: records are exposed, remediation is costly, trust is damaged. When an attacker compromises the control systems governing a municipal water supply or an electrical distribution network, the harm is <strong>physical and potentially irreversible</strong>. This field is not primarily about protecting data. It is about preventing outcomes that affect people who have never heard of ICS security and will never know how close they came to harm.</p>
+      <br>
+      <div class="hl-pill neon">IBM Cost of Breach 2024</div>
+    </div>
+    <div class="immersive-quote reveal" style="transition-delay:0.3s">
+      "WHEN ATTACKERS MEASURE SUCCESS IN <span class="hl">MONTHS OF UNDETECTED ACCESS,</span> AND DEFENDERS MEASURE RESPONSE IN DAYS, THE SCOREBOARD IS ALREADY DECIDED."
+    </div>
+  </div>
+</div>
+
+<!-- EMERGING THREATS -->
+<section class="section" id="emerging">
+  <div class="sec-header reveal">
+    <span class="sec-num">07</span>
+    <div class="sec-title-group">
+      <span class="sec-eyebrow">2025–2030 Threat Horizon</span>
+      <h2 class="sec-title">EMERGING THREATS</h2>
+    </div>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="emerging-grid">
+    <div class="emerging-item reveal">
+      <div class="emerging-year">26</div>
+      <div>
+        <div class="emerging-title">AI-Powered Attacks on IIoT</div>
+        <p class="emerging-desc">Artificial intelligence capabilities are beginning to appear in the offensive toolkits targeting industrial control systems. Machine learning models capable of analyzing SCADA protocol traffic, autonomously identifying exploitable vulnerabilities in industrial device configurations, and adapting attack strategies in real-time represent a qualitative escalation in the threat landscape. Both Dragos and Mandiant have documented instances of large language model-assisted reconnaissance activities targeting industrial communication protocols during 2024 and early 2025. As these capabilities become more widely accessible, they are expected to narrow the gap between nation-state-level ICS attack sophistication and what is achievable by less-resourced threat actors.</p>
+        <div class="tl-tags" style="margin-top:12px">
+          <span class="tl-tag tag-red">AI/ML</span>
+          <span class="tl-tag tag-neon">AUTONOMOUS</span>
+          <span class="tl-tag tag-orange">OBSERVED 2024</span>
+        </div>
+      </div>
+      <div class="emerging-status status-active">● ACTIVE</div>
+    </div>
+    <div class="emerging-item reveal" style="transition-delay:0.15s">
+      <div class="emerging-year">27</div>
+      <div>
+        <div class="emerging-title">Quantum Decryption — "Harvest Now, Decrypt Later"</div>
+        <p class="emerging-desc">Nation-state intelligence agencies and well-resourced threat actors are engaged in the systematic collection of encrypted IIoT network traffic today, with the intention of decrypting it once quantum computing capabilities mature to a sufficient level, a timeframe widely estimated to fall within the next decade. The consequence for industrial environments is significant: encrypted communications captured now, including control system configurations, infrastructure network topologies, and operational parameters, may eventually be made legible to adversaries. The migration of operational technology cryptographic systems to post-quantum algorithms has barely commenced, and the long service life of ICS hardware means that equipment purchased today may still be deployed when quantum decryption becomes operationally feasible.</p>
+        <div class="tl-tags" style="margin-top:12px">
+          <span class="tl-tag tag-neon">QUANTUM</span>
+          <span class="tl-tag tag-orange">IN-PROGRESS</span>
+        </div>
+      </div>
+      <div class="emerging-status status-watch">◌ WATCH</div>
+    </div>
+    <div class="emerging-item reveal" style="transition-delay:0.3s">
+      <div class="emerging-year">26</div>
+      <div>
+        <div class="emerging-title">5G IIoT Attack Surface Explosion</div>
+        <p class="emerging-desc">The industrial adoption of 5G connectivity is enabling IIoT deployments at a scale previously impractical with wired or Wi-Fi infrastructure. Industrial sensors, autonomous mobile equipment, and process monitoring devices are being connected to 5G networks at pace, frequently with minimal security architecture review applied to the specific risks of wireless ICS connectivity. Misconfiguration of 5G network slicing, the technology that creates isolated virtual network segments on shared physical infrastructure, could enable lateral movement between environments intended to remain isolated, potentially exposing an entire smart manufacturing floor through a single vulnerable network slice.</p>
+        <div class="tl-tags" style="margin-top:12px">
+          <span class="tl-tag tag-red">5G / WIRELESS</span>
+          <span class="tl-tag tag-neon">SCALE RISK</span>
+        </div>
+      </div>
+      <div class="emerging-status status-active">● ACTIVE</div>
+    </div>
+    <div class="emerging-item reveal" style="transition-delay:0.45s">
+      <div class="emerging-year">28</div>
+      <div>
+        <div class="emerging-title">Digital Twin Manipulation</div>
+        <p class="emerging-desc">Digital twin technology, the creation of continuously synchronized virtual replicas of physical industrial systems, is increasingly used for process monitoring, predictive maintenance, and operational planning. As operators come to rely on these models for real-time situational awareness, the integrity of the data feeding the twin becomes a security concern in its own right. An attacker who can manipulate the sensor data reported to a digital twin without altering the underlying physical process can cause operators to make decisions based on a falsified representation of reality, masking developing equipment failures, concealing ongoing physical sabotage, or triggering unnecessary emergency shutdowns that interrupt production.</p>
+        <div class="tl-tags" style="margin-top:12px">
+          <span class="tl-tag tag-neon">DIGITAL TWIN</span>
+          <span class="tl-tag tag-orange">DATA INTEGRITY</span>
+        </div>
+      </div>
+      <div class="emerging-status status-watch">◌ WATCH</div>
+    </div>
+  </div>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-inner">
+    <div class="sources-title">SOURCES & REFERENCES</div>
+    <div class="source-list">
+      <div class="source-row"><span class="source-idx">[1]</span><span>Dragos — <em>OT/ICS Cybersecurity Report 2024</em> — <a class="source-link" href="https://www.dragos.com/year-in-review/" target="_blank">dragos.com/year-in-review</a></span></div>
+      <div class="source-row"><span class="source-idx">[2]</span><span>CISA — <em>Industrial Control Systems Advisories</em> — <a class="source-link" href="https://www.cisa.gov/ics" target="_blank">cisa.gov/ics</a></span></div>
+      <div class="source-row"><span class="source-idx">[3]</span><span>Claroty — <em>State of XIoT Security H2 2023</em> — <a class="source-link" href="https://claroty.com/resources" target="_blank">claroty.com/resources</a></span></div>
+      <div class="source-row"><span class="source-idx">[4]</span><span>NIST — <em>SP 800-82 Rev. 3: OT Security Guide</em> — <a class="source-link" href="https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final" target="_blank">csrc.nist.gov</a></span></div>
+      <div class="source-row"><span class="source-idx">[5]</span><span>Mandiant — <em>Volt Typhoon: Pre-positioning on US Critical Infrastructure</em> — <a class="source-link" href="https://www.mandiant.com" target="_blank">mandiant.com</a></span></div>
+      <div class="source-row"><span class="source-idx">[6]</span><span>ICS-CERT / CISA — <em>KEV Catalog 2023–2024</em> — <a class="source-link" href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank">cisa.gov/kev-catalog</a></span></div>
+      <div class="source-row"><span class="source-idx">[7]</span><span>Palo Alto Unit 42 — <em>IoT Threat Report 2023</em> — <a class="source-link" href="https://unit42.paloaltonetworks.com" target="_blank">unit42.paloaltonetworks.com</a></span></div>
+      <div class="source-row"><span class="source-idx">[8]</span><span>IBM Security — <em>Cost of a Data Breach Report 2024</em> — <a class="source-link" href="https://www.ibm.com/reports/data-breach" target="_blank">ibm.com/reports/data-breach</a></span></div>
+      <div class="source-row"><span class="source-idx">[9]</span><span>IEC 62443 — <em>Industrial Cybersecurity Standard</em> — <a class="source-link" href="https://www.iec.ch/iec62443" target="_blank">iec.ch/iec62443</a></span></div>
+      <div class="source-row"><span class="source-idx">[10]</span><span>IoT Analytics — <em>IIoT Platform & Device Forecast 2030</em> — <a class="source-link" href="https://iot-analytics.com" target="_blank">iot-analytics.com</a></span></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- EMAIL SUBSCRIPTION / ENQUIRY SECTION -->
+<div class="email-section" id="subscribe">
+  <div class="email-inner">
+    <div class="email-left reveal">
+      <div class="email-eyebrow">Stay Ahead of the Threat</div>
+      <h2 class="email-heading">INTEL DELIVERED<br>TO YOUR <span class="hl-red">INBOX</span></h2>
+      <p class="email-desc">
+        Get the latest IIoT threat intelligence, zero-day advisories, and critical infrastructure security briefings — curated for OT security professionals and delivered before the news cycle catches up.
+      </p>
+      <div class="email-perks">
+        <div class="email-perk"><span class="email-perk-dot"></span>New blog posts &amp; deep-dive reports</div>
+        <div class="email-perk"><span class="email-perk-dot"></span>ICS/OT vulnerability advisories</div>
+        <div class="email-perk"><span class="email-perk-dot"></span>Threat actor tracking updates</div>
+        <div class="email-perk"><span class="email-perk-dot"></span>No spam — unsubscribe anytime</div>
+      </div>
+    </div>
+
+    <div class="email-right reveal" style="transition-delay:0.2s">
+      <div class="email-form-title">// Connect With Us</div>
+      <div class="email-tabs">
+        <div class="email-tab active" onclick="switchTab('subscribe')">Subscribe</div>
+        <div class="email-tab" onclick="switchTab('enquiry')">Enquiry</div>
+      </div>
+
+      <!-- Subscribe panel -->
+      <div class="email-form-panel active" id="panel-subscribe">
+        <div id="form-subscribe">
+          <div class="email-field">
+            <label class="email-label" for="sub-name">Full Name</label>
+            <input class="email-input" id="sub-name" type="text" placeholder="Jane Smith">
+          </div>
+          <div class="email-field">
+            <label class="email-label" for="sub-email">Work Email</label>
+            <input class="email-input" id="sub-email" type="email" placeholder="you@company.com">
+          </div>
+          <div class="email-field">
+            <label class="email-label" for="sub-role">Your Role</label>
+            <select class="email-select" id="sub-role">
+              <option value="" disabled selected>Select your role…</option>
+              <option>OT / ICS Security Engineer</option>
+              <option>SOC Analyst</option>
+              <option>CISO / Security Director</option>
+              <option>Industrial Operations</option>
+              <option>Researcher / Academic</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <button class="email-submit" onclick="handleSubscribe()">Subscribe to Intel Feed →</button>
+          <p class="email-note">We respect your privacy. Your data is never sold or shared with third parties.</p>
+        </div>
+        <div class="email-success" id="success-subscribe">
+          <span class="email-success-icon">✓ SUBSCRIBED</span>
+          <p class="email-success-msg">You're on the list. Expect your first briefing shortly.<br>Check your inbox for a confirmation.</p>
+        </div>
+      </div>
+
+      <!-- Enquiry panel -->
+      <div class="email-form-panel" id="panel-enquiry">
+        <div id="form-enquiry">
+          <div class="email-field">
+            <label class="email-label" for="enq-name">Full Name</label>
+            <input class="email-input" id="enq-name" type="text" placeholder="Jane Smith">
+          </div>
+          <div class="email-field">
+            <label class="email-label" for="enq-email">Email Address</label>
+            <input class="email-input" id="enq-email" type="email" placeholder="you@company.com">
+          </div>
+          <div class="email-field">
+            <label class="email-label" for="enq-org">Organisation</label>
+            <input class="email-input" id="enq-org" type="text" placeholder="Company / Institution">
+          </div>
+          <div class="email-field">
+            <label class="email-label" for="enq-subject">Subject</label>
+            <select class="email-select" id="enq-subject">
+              <option value="" disabled selected>Select topic…</option>
+              <option>Research Collaboration</option>
+              <option>Media / Press Inquiry</option>
+              <option>Security Advisory</option>
+              <option>Speaking / Training</option>
+              <option>General Inquiry</option>
+            </select>
+          </div>
+          <div class="email-field">
+            <label class="email-label" for="enq-msg">Message</label>
+            <textarea class="email-input" id="enq-msg" rows="4" placeholder="Describe your inquiry…" style="resize:vertical;min-height:90px"></textarea>
+          </div>
+          <button class="email-submit email-submit-enq" onclick="handleEnquiry()">Send Enquiry →</button>
+          <p class="email-note">We aim to respond within 2 business days.</p>
+        </div>
+        <div class="email-success" id="success-enquiry">
+          <span class="email-success-icon">✓ SENT</span>
+          <p class="email-success-msg">Your enquiry has been received.<br>We'll be in touch within 2 business days.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">IIoT://SEC</div>
+  <div class="footer-copy">© 2025 IIoT Threat Intelligence. All rights reserved.</div>
+  <a href="#subscribe" style="font-family:'Syne',sans-serif;font-size:13px;color:var(--neon);text-decoration:none;letter-spacing:1px;">SUBSCRIBE ↑</a>
+</footer>
+
+<script>
+// ── CURSOR ──────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx - 6 + 'px';
+  cursor.style.top  = my - 6 + 'px';
+});
+(function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) *.12;
+  ring.style.left = rx - 20 + 'px';
+  ring.style.top  = ry - 20 + 'px';
+  requestAnimationFrame(animRing);
+})();
+document.querySelectorAll('a,button,.threat-card-3d,.photo-strip-item,.acc-trigger').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2)'; ring.style.transform = 'scale(1.5)'; });
+  el.addEventListener('mouseleave', () => { cursor.style.transform = 'scale(1)'; ring.style.transform = 'scale(1)'; });
+});
+
+// ── PARTICLE CANVAS ─────────────────────────────────────
+const canvas = document.getElementById('bg-canvas');
+const ctx    = canvas.getContext('2d');
+let W, H, particles = [];
+function resizeCanvas() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x  = Math.random() * W;
+    this.y  = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.r  = Math.random() * 1.5 + 0.5;
+    this.a  = Math.random() * 0.12 + 0.04;
+    this.c  = Math.random() > 0.5 ? '8,145,178' : '192,57,43';
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${this.c},${this.a})`;
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 180; i++) particles.push(new Particle());
+
+function drawConnections() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 100) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(8,145,178,${0.08 * (1 - dist/100)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+(function animate() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => { p.update(); p.draw(); });
+  drawConnections();
+  requestAnimationFrame(animate);
+})();
+
+// ── PARALLAX HERO ────────────────────────────────────────
+const heroBg = document.getElementById('heroBg');
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  if (heroBg) heroBg.style.transform = `scale(1.05) translateY(${scrolled * 0.3}px)`;
+});
+
+// ── COUNTERS ─────────────────────────────────────────────
+function animateCount(el, endVal, suffix, dec, duration = 1500) {
+  let start = null;
+  const step = ts => {
+    if (!start) start = ts;
+    const progress = Math.min((ts - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const val = dec ? (endVal * ease).toFixed(dec) : Math.round(endVal * ease);
+    el.textContent = (dec ? '$' : '') + val + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// ── INTERSECTION OBSERVER ────────────────────────────────
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Trigger stat bar widths
+      const bar = entry.target.querySelector('.stat-bar-mini');
+      if (bar) setTimeout(() => { bar.style.width = '100%'; }, 200);
+      // Trigger counters
+      if (entry.target.id === 'statsRow') {
+        animateCount(document.getElementById('s1'), 36, 'B+', 0);
+        animateCount(document.getElementById('s2'), 140, '%', 0);
+        animateCount(document.getElementById('s3'), 4.7, 'B', 1);
+        animateCount(document.getElementById('s4'), 57, '%', 0);
+        ['sb1','sb2','sb3','sb4'].forEach(id => {
+          setTimeout(() => { const b = document.getElementById(id); if(b) b.style.width='100%'; }, 300);
+        });
+      }
+    }
+  });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.reveal, .tl-item, .chart-row').forEach(el => io.observe(el));
+io.observe(document.getElementById('statsRow'));
+
+// ── TIMELINE ANIMATION ───────────────────────────────────
+const tlObserver = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 150);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.tl-item').forEach(el => tlObserver.observe(el));
+
+// ── VULNERABILITY CHART ──────────────────────────────────
+const vulnData = [
+  { label: 'Improper input validation', pct: 38, color: '#ff2d2d' },
+  { label: 'Authentication bypass',     pct: 29, color: '#f97316' },
+  { label: 'Out-of-bounds read/write',  pct: 24, color: '#a855f7' },
+  { label: 'Hardcoded credentials',     pct: 21, color: '#3b82f6' },
+  { label: 'Missing encryption',        pct: 18, color: '#0891b2' },
+  { label: 'Path traversal',            pct: 14, color: '#ffc947' },
+  { label: 'Use after free',            pct: 11, color: '#ec4899' },
+];
+const chartEl = document.getElementById('vulnChart');
+vulnData.forEach((v, i) => {
+  const row = document.createElement('div');
+  row.className = 'chart-row';
+  row.style.transitionDelay = i * 80 + 'ms';
+  row.innerHTML = `
+    <div class="chart-label">${v.label}</div>
+    <div class="chart-track">
+      <div class="chart-fill" style="background:${v.color};width:0" data-pct="${v.pct}">${v.pct}%</div>
+    </div>
+    <div class="chart-pct">${v.pct}%</div>`;
+  chartEl.appendChild(row);
+});
+
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const rows = entry.target.querySelectorAll('.chart-row');
+      rows.forEach((row, i) => {
+        setTimeout(() => {
+          row.classList.add('visible');
+          const fill = row.querySelector('.chart-fill');
+          if (fill) fill.style.width = fill.dataset.pct + '%';
+        }, i * 100);
+      });
+      chartObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.2 });
+chartObs.observe(chartEl);
+
+// ── PROTOCOL ACCORDION ───────────────────────────────────
+const protocols = [
+  { icon: 'MB', name: 'Modbus TCP', sub: 'Port 502 — the original ICS protocol (1979)', body: 'Modbus occupies an unusual position in industrial cybersecurity: it is simultaneously among the most widely deployed protocols in the world and among the most fundamentally insecure. Its 1979 design assumptions — that industrial networks were physically isolated, and that the only people issuing commands were authorised operators in the same building — made authentication and encryption unnecessary by the standards of the time. Those assumptions are now false for the majority of Modbus deployments, and the protocol itself has no mechanism to address this. Every command accepted from an unauthorised sender is treated as legitimate. Shodan continuously identifies millions of accessible Modbus endpoints, each of which will respond to arbitrary commands from any source on the network.', risk: 'CVSS 9.8 — CRITICAL' },
+  { icon: 'D3', name: 'DNP3', sub: 'Utility and water infrastructure backbone', body: 'DNP3 represents a partial step toward communication security that has been largely undermined by deployment choices made in the field. The protocol permits optional authentication, and Secure Authentication version 5 provides a meaningful improvement for operators who implement it. The operative word is optional: compatibility concerns with existing equipment, the cost of upgrading remote field devices, and the operational complexity of managing certificates in unmanned substations have collectively kept SAv5 adoption low. The result is that the majority of DNP3 endpoints in electric utility and water infrastructure respond to commands without verifying the sender — making replay and command injection attacks achievable with modest technical investment.', risk: 'CVSS 8.6 — HIGH' },
+  { icon: 'OPC', name: 'OPC-UA', sub: 'Modern ICS middleware — security optional', body: 'OPC-UA is frequently cited as the answer to the security problems endemic in legacy industrial protocols — and in principle, it is. Its architecture includes mutual authentication, message signing, and channel encryption. What undermines this in practice is not a flaw in the standard but a pattern of deployment behaviour: when certificate validation errors arise during commissioning, they are typically resolved by disabling validation rather than diagnosing the cause. When security profiles create compatibility issues, they are set to None rather than debugged. These decisions, made under pressure to keep systems operational, are difficult to reverse once production begins. Surveys of production OPC-UA environments consistently find significant proportions running without any effective security configuration in place.', risk: 'CVSS 7.5 — HIGH' },
+  { icon: 'MQ', name: 'MQTT', sub: 'IIoT sensor messaging — broker risks', body: "MQTT's lightweight design was a deliberate choice for environments where bandwidth is constrained and power consumption matters. Security was an afterthought in its original design, and in many deployments it remains an afterthought today. The protocol's broker architecture concentrates IIoT data from potentially thousands of devices into a small number of central aggregation points. Without TLS and access controls, these brokers expose their full telemetry streams to any client that connects. Shodan's ongoing cataloguing of publicly accessible MQTT brokers reveals not just their existence but their data: live industrial readings including temperature, pressure, and valve states, transmitted in plaintext to anyone who chooses to subscribe.", risk: 'CVSS 8.1 — HIGH' },
+  { icon: 'BN', name: 'BACnet', sub: 'Building automation — physical safety risks', body: 'BACnet entered widespread deployment as a building management protocol, administered by facilities teams with no cybersecurity background and no expectation that one would be required. Its design reflects this: authentication is absent by default, network discovery is built in, and the standard was written assuming that only authorised building engineers would ever interact with it. The gap between that assumption and reality became apparent as buildings connected to enterprise IT networks. An attacker who reaches a BACnet network through any adjacent connected system can interact directly with fire suppression systems, elevator controls, and HVAC — in buildings where those systems share infrastructure with clinical operations, government facilities, or financial environments whose data they were never intended to touch.', risk: 'CVSS 9.1 — CRITICAL' },
+];
+
+const acc = document.getElementById('protoAccordion');
+protocols.forEach((p, i) => {
+  const item = document.createElement('div');
+  item.className = 'acc-item';
+  item.innerHTML = `
+    <button class="acc-trigger" onclick="toggleAcc(this)">
+      <div class="acc-trigger-left">
+        <div class="acc-icon-wrap">${p.icon}</div>
+        <div>
+          <div class="acc-name">${p.name}</div>
+          <div class="acc-sub">${p.sub}</div>
+        </div>
+      </div>
+      <span class="acc-arrow">+</span>
+    </button>
+    <div class="acc-body">
+      <div class="acc-body-inner">
+        ${p.body}
+        <div class="acc-risk">[RISK] ${p.risk}</div>
+      </div>
+    </div>`;
+  acc.appendChild(item);
+});
+
+function toggleAcc(btn) {
+  const item = btn.closest('.acc-item');
+  const body = item.querySelector('.acc-body');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.acc-body').style.maxHeight = '0';
+  });
+  if (!isOpen) {
+    item.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+  }
+}
+
+// ── REDACTED CLICK ───────────────────────────────────────
+document.querySelectorAll('.redacted').forEach(el => {
+  el.addEventListener('click', () => el.classList.toggle('revealed'));
+});
+
+// ── EMAIL SUBSCRIPTION / ENQUIRY ─────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.email-tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && tab === 'subscribe') || (i === 1 && tab === 'enquiry'));
+  });
+  document.getElementById('panel-subscribe').classList.toggle('active', tab === 'subscribe');
+  document.getElementById('panel-enquiry').classList.toggle('active', tab === 'enquiry');
+}
+
+function handleSubscribe() {
+  const name  = document.getElementById('sub-name').value.trim();
+  const email = document.getElementById('sub-email').value.trim();
+  if (!name || !email) { alert('Please fill in your name and email.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Please enter a valid email address.'); return; }
+  document.getElementById('form-subscribe').style.display = 'none';
+  document.getElementById('success-subscribe').style.display = 'block';
+  // In a real deployment, POST to your newsletter API here
+}
+
+function handleEnquiry() {
+  const name  = document.getElementById('enq-name').value.trim();
+  const email = document.getElementById('enq-email').value.trim();
+  const msg   = document.getElementById('enq-msg').value.trim();
+  if (!name || !email || !msg) { alert('Please fill in your name, email, and message.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Please enter a valid email address.'); return; }
+  document.getElementById('form-enquiry').style.display = 'none';
+  document.getElementById('success-enquiry').style.display = 'block';
+  // In a real deployment, POST to your enquiry API / mailto: here
+}
+</script>
+</body>
+</html>
