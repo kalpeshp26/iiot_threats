@@ -6,6 +6,7 @@
 <title>IIoT Threat Landscape 2025 — Industrial Cybersecurity Deep Dive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 :root {
   --red: #c0392b;
@@ -108,10 +109,10 @@ nav {
 .hero-bg-img {
   position: absolute;
   inset: 0;
-  background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1800&q=80');
+  background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=1800&q=80');
   background-size: cover;
   background-position: center;
-  filter: brightness(0.2) saturate(0.3);
+  filter: brightness(0.45) saturate(0.6);
   z-index: 0;
   transform: scale(1.05);
   transition: transform 0.1s ease-out;
@@ -120,7 +121,7 @@ nav {
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(15,23,42,0.3) 0%, transparent 50%, rgba(15,23,42,0.8) 100%);
+  background: linear-gradient(to bottom, rgba(15,23,42,0.1) 0%, transparent 40%, rgba(15,23,42,0.7) 100%);
   z-index: 1;
 }
 
@@ -224,13 +225,14 @@ nav {
   bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   opacity: 0;
   animation: fadeIn 1s ease 1.5s forwards;
+  pointer-events: none;
 }
 .scroll-line {
   width: 1px;
@@ -240,10 +242,11 @@ nav {
 }
 .scroll-text {
   font-family: 'Syne', sans-serif;
-  font-size: 12px;
-  letter-spacing: 3px;
-  color: rgba(255,255,255,0.45);
-  writing-mode: vertical-rl;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.6);
+  writing-mode: horizontal-tb;
+  text-transform: uppercase;
 }
 
 /* STATS TICKER */
@@ -1225,7 +1228,6 @@ footer {
 @media (max-width: 900px) {
   .email-inner { grid-template-columns: 1fr; gap: 40px; padding: 64px 24px; }
 }
-.email-left {}
 .email-eyebrow {
   font-family: 'Syne', sans-serif;
   font-size: 13px;
@@ -1418,6 +1420,7 @@ footer {
   letter-spacing: 1px;
   line-height: 1.8;
 }
+
 </style>
 </head>
 <body>
@@ -1485,8 +1488,8 @@ footer {
     </div>
   </div>
   <div class="scroll-indicator">
-    <div class="scroll-line"></div>
     <span class="scroll-text">SCROLL</span>
+    <div class="scroll-line"></div>
   </div>
 </section>
 
@@ -1658,7 +1661,7 @@ footer {
 <!-- PHOTO STRIP -->
 <div class="photo-strip">
   <div class="photo-strip-item">
-    <img class="photo-strip-img" src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80" alt="Industrial control room">
+    <img class="photo-strip-img" src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80" alt="Industrial control room">
     <div class="photo-strip-caption">SCADA Control Room — Power Grid Operations</div>
   </div>
   <div class="photo-strip-item">
@@ -1670,18 +1673,18 @@ footer {
     <div class="photo-strip-caption">OT Network Infrastructure — Industrial LAN</div>
   </div>
   <div class="photo-strip-item">
-    <img class="photo-strip-img" src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80" alt="Cybersecurity">
+    <img class="photo-strip-img" src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80" alt="SOC monitoring">
     <div class="photo-strip-caption">Threat Monitoring — SOC Operations</div>
   </div>
   <div class="photo-strip-item">
-    <img class="photo-strip-img" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80" alt="Power plant">
+    <img class="photo-strip-img" src="https://images.unsplash.com/photo-1497435334941-8c899a9bd6b2?w=800&q=80" alt="Power plant">
     <div class="photo-strip-caption">Critical Infrastructure — Energy Sector</div>
   </div>
 </div>
 
 <!-- IMMERSIVE QUOTE SECTION -->
 <div class="immersive-section">
-  <div class="immersive-bg" style="background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=1800&q=80')"></div>
+  <div class="immersive-bg" style="background-image: url('https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=1800&q=80')"></div>
   <div class="immersive-overlay"></div>
   <div class="immersive-content">
     <div class="immersive-quote reveal">
@@ -1809,7 +1812,7 @@ footer {
   <div class="case-grid">
     <div class="case-card reveal">
       <div class="case-img-wrap">
-        <img class="case-img" src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80" alt="Power plant">
+        <img class="case-img" src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80" alt="Power lines pipeline">
         <div class="case-img-overlay"></div>
         <div class="case-year-badge">2021</div>
       </div>
@@ -1821,7 +1824,7 @@ footer {
     </div>
     <div class="case-card reveal" style="transition-delay:0.2s">
       <div class="case-img-wrap">
-        <img class="case-img" src="https://images.unsplash.com/photo-1624969862293-b749659ccc4e?w=800&q=80" alt="Water treatment">
+        <img class="case-img" src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80" alt="Water treatment facility">
         <div class="case-img-overlay"></div>
         <div class="case-year-badge">2021</div>
       </div>
@@ -1833,7 +1836,7 @@ footer {
     </div>
     <div class="case-card reveal" style="transition-delay:0.1s">
       <div class="case-img-wrap">
-        <img class="case-img" src="https://images.unsplash.com/photo-1592659762303-90081d34b277?w=800&q=80" alt="Hospital">
+        <img class="case-img" src="https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=800&q=80" alt="Hospital corridor">
         <div class="case-img-overlay"></div>
         <div class="case-year-badge">2023</div>
       </div>
@@ -1845,7 +1848,7 @@ footer {
     </div>
     <div class="case-card reveal" style="transition-delay:0.3s">
       <div class="case-img-wrap">
-        <img class="case-img" src="https://images.unsplash.com/photo-1565108253264-5c08e30e5f63?w=800&q=80" alt="Factory floor">
+        <img class="case-img" src="https://images.unsplash.com/photo-1565108253264-5c08e30e5f63?w=800&q=80" alt="Automotive factory">
         <div class="case-img-overlay"></div>
         <div class="case-year-badge">2022</div>
       </div>
@@ -1929,7 +1932,7 @@ footer {
 
 <!-- SECOND IMMERSIVE -->
 <div class="immersive-section">
-  <div class="immersive-bg" style="background-image: url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1800&q=80')"></div>
+  <div class="immersive-bg" style="background-image: url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1800&q=80')"></div>
   <div class="immersive-overlay"></div>
   <div class="immersive-content">
     <div class="immersive-body reveal">
@@ -2128,12 +2131,7 @@ footer {
   </div>
 </div>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">IIoT://SEC</div>
-  <div class="footer-copy">© 2025 IIoT Threat Intelligence. All rights reserved.</div>
-  <a href="#subscribe" style="font-family:'Syne',sans-serif;font-size:13px;color:var(--neon);text-decoration:none;letter-spacing:1px;">SUBSCRIBE ↑</a>
-</footer>
+
 
 <script>
 // ── CURSOR ──────────────────────────────────────────────
@@ -2368,7 +2366,7 @@ document.querySelectorAll('.redacted').forEach(el => {
   el.addEventListener('click', () => el.classList.toggle('revealed'));
 });
 
-// ── EMAIL SUBSCRIPTION / ENQUIRY ─────────────────────────
+// ── EMAIL via mailto (zero dependencies) ─────────────────
 function switchTab(tab) {
   document.querySelectorAll('.email-tab').forEach((t, i) => {
     t.classList.toggle('active', (i === 0 && tab === 'subscribe') || (i === 1 && tab === 'enquiry'));
@@ -2380,23 +2378,124 @@ function switchTab(tab) {
 function handleSubscribe() {
   const name  = document.getElementById('sub-name').value.trim();
   const email = document.getElementById('sub-email').value.trim();
+  const role  = document.getElementById('sub-role').value || 'Not specified';
   if (!name || !email) { alert('Please fill in your name and email.'); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Please enter a valid email address.'); return; }
-  document.getElementById('form-subscribe').style.display = 'none';
-  document.getElementById('success-subscribe').style.display = 'block';
-  // In a real deployment, POST to your newsletter API here
+
+  const subject = encodeURIComponent('New IIoT Intelligence Subscriber');
+  const body = encodeURIComponent(
+`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  NEW SUBSCRIBER — IIoT Threat Intel
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Name    : ${name}
+  Email   : ${email}
+  Role    : ${role}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Submitted via IIoT Threat Landscape 2025`
+  );
+  window.location.href = `mailto:netra.lalwani24@vit.edu?subject=${subject}&body=${body}`;
+  setTimeout(() => {
+    document.getElementById('form-subscribe').style.display = 'none';
+    document.getElementById('success-subscribe').style.display = 'block';
+  }, 800);
 }
 
 function handleEnquiry() {
-  const name  = document.getElementById('enq-name').value.trim();
-  const email = document.getElementById('enq-email').value.trim();
-  const msg   = document.getElementById('enq-msg').value.trim();
+  const name    = document.getElementById('enq-name').value.trim();
+  const email   = document.getElementById('enq-email').value.trim();
+  const org     = document.getElementById('enq-org').value.trim() || '—';
+  const subject = document.getElementById('enq-subject').value || 'General Inquiry';
+  const msg     = document.getElementById('enq-msg').value.trim();
   if (!name || !email || !msg) { alert('Please fill in your name, email, and message.'); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Please enter a valid email address.'); return; }
-  document.getElementById('form-enquiry').style.display = 'none';
-  document.getElementById('success-enquiry').style.display = 'block';
-  // In a real deployment, POST to your enquiry API / mailto: here
+
+  const mailSubject = encodeURIComponent(`IIoT Enquiry — ${subject}`);
+  const body = encodeURIComponent(
+`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  NEW ENQUIRY — IIoT Threat Intel
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Name         : ${name}
+  Email        : ${email}
+  Organisation : ${org}
+  Subject      : ${subject}
+
+  Message
+  ───────────────────────────────
+  ${msg}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Submitted via IIoT Threat Landscape 2025`
+  );
+  window.location.href = `mailto:netra.lalwani24@vit.edu?subject=${mailSubject}&body=${body}`;
+  setTimeout(() => {
+    document.getElementById('form-enquiry').style.display = 'none';
+    document.getElementById('success-enquiry').style.display = 'block';
+  }, 800);
 }
+
+// ── EMAILJS ──────────────────────────────────────────────
+emailjs.init('HvGodCgTttU5cScMD');
+
+const EJS_SERVICE  = 'service_1wq1khe';
+const EJS_TEMPLATE = 'template_ovj7u1v';
+const EJS_SENDER   = 'netra.lalwani24@vit.edu';
+
+function switchTab(tab) {
+  document.querySelectorAll('.email-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.email-form-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+function handleSubscribe() {
+  const name  = document.getElementById('sub-name').value.trim();
+  const email = document.getElementById('sub-email').value.trim();
+  const role  = document.getElementById('sub-role').value;
+  if (!name || !email || !role) { alert('Please fill in all fields.'); return; }
+
+  emailjs.send(EJS_SERVICE, EJS_TEMPLATE, {
+    from_name:  'Netra Lalwani',
+    from_email: EJS_SENDER,
+    reply_to:   EJS_SENDER,
+    to_email:   email,
+    to_name:    name,
+    subject:    '[IIoT Security] Welcome to the Threat Intelligence Feed',
+    message:    `Hi ${name},\n\nThank you for subscribing to the IIoT Threat Intelligence Feed.\n\nYou will now receive weekly briefings on ICS/OT vulnerabilities, APT activity, and emerging IIoT attack vectors — curated for professionals like you.\n\nRole registered: ${role}\n\nStay vigilant,\nNetra Lalwani\nIIoT Threat Intelligence Report\nnetra.lalwani24@vit.edu`
+  }).then(() => {
+    document.getElementById('form-subscribe').style.display = 'none';
+    document.getElementById('success-subscribe').style.display = 'flex';
+  }).catch(err => {
+    alert('Failed to send: ' + (err?.text || JSON.stringify(err)));
+  });
+}
+
+function handleEnquiry() {
+  const name    = document.getElementById('enq-name').value.trim();
+  const email   = document.getElementById('enq-email').value.trim();
+  const org     = document.getElementById('enq-org').value.trim();
+  const subject = document.getElementById('enq-subject').value;
+  const msg     = document.getElementById('enq-msg').value.trim();
+  if (!name || !email || !subject || !msg) { alert('Please fill in all required fields.'); return; }
+
+  emailjs.send(EJS_SERVICE, EJS_TEMPLATE, {
+    from_name:  'Netra Lalwani',
+    from_email: EJS_SENDER,
+    reply_to:   EJS_SENDER,
+    to_email:   email,
+    to_name:    name,
+    subject:    `[IIoT Security] Re: ${subject}`,
+    message:    `Hi ${name},\n\nThank you for your enquiry regarding "${subject}".\n\nWe have received your message and will respond within 2 business days.\n\nYour message:\n"${msg}"\n\nOrganisation: ${org || 'Not provided'}\n\nBest regards,\nNetra Lalwani\nIIoT Threat Intelligence Report\nnetra.lalwani24@vit.edu`
+  }).then(() => {
+    document.getElementById('form-enquiry').style.display = 'none';
+    document.getElementById('success-enquiry').style.display = 'flex';
+  }).catch(err => {
+    alert('Failed to send: ' + (err?.text || JSON.stringify(err)));
+  });
+}
+
 </script>
 </body>
 </html>
